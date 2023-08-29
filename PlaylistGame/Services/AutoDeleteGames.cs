@@ -1,4 +1,4 @@
-namespace SWITSTIGPTY.Services;
+namespace PlaylistGame.Services;
 
 public class AutoDeleteGames : IHostedService
 {

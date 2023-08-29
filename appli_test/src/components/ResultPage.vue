@@ -12,7 +12,7 @@ const handleNextRound = async () => {
 }
 
 // Props
-const { isOwner, players, isEndScreen } = defineProps({
+const { isOwner, players, isEndScreen, impostorId } = defineProps({
     isOwner: {
         type: Boolean,
         default: false
@@ -24,6 +24,10 @@ const { isOwner, players, isEndScreen } = defineProps({
     isEndScreen: {
         type: Boolean,
         default: false
+    },
+    impostorId: {
+        type: String,
+        default: ""
     }
 });
 
@@ -54,6 +58,7 @@ onMounted(() => {
                     v-for="player in sortedPlayers"
                     :key="player.id"
                     :item="player"
+                    :is-impostor="player.id === impostorId"
                     v-bind:class="{ 'visible': player.isVisible }"
             />
         <ValidationButton v-if="isOwner" msg="Next Round" @onClick="handleNextRound" color="blue"/>

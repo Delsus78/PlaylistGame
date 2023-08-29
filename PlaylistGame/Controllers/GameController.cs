@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using SWITSTIGPTY.Models;
-using SWITSTIGPTY.Services;
+using PlaylistGame.Models;
+using PlaylistGame.Services;
 
-namespace SWITSTIGPTY.Controllers;
+namespace PlaylistGame.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -23,17 +23,14 @@ public class GameController : ControllerBase
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="type">
-    /// top-all-time
-    /// all
-    /// genre</param>
-    /// <param name="genre">
-    /// </param>
+    /// <param name="numberOfSongPerPlayer"/>
+    /// <param name="pointsPerRightVote"></param>
+    /// <param name="pointsPerVoteFooled"></param>
     /// <returns></returns>
-    [HttpGet(Name = "CreateGame")]
-    public async Task<Game> CreateGame(string type, string? genre, int numberOfManches, int pointsPerRightVote, int pointsPerVoteFooled)
+    [HttpPost(Name = "CreateGame")]
+    public async Task<Game> CreateGame(int numberOfSongPerPlayer, int pointsPerRightVote, int pointsPerVoteFooled)
     {
-        return await _gameService.CreateGame(type, genre, numberOfManches, pointsPerRightVote, pointsPerVoteFooled);
+        return await _gameService.CreateGame(numberOfSongPerPlayer, pointsPerRightVote, pointsPerVoteFooled);
     }
     
     [HttpGet("{gameCode}", Name = "GetGame")]
@@ -47,13 +44,7 @@ public class GameController : ControllerBase
     {
         return _gameService.GetGames();
     }
-    
-    [HttpGet("allgenres", Name = "GetAllGenres")]
-    public async Task<IEnumerable<string>> GetAllGenres()
-    {
-        return _gameService.GetAllGenres();
-    }
-    
+
     [HttpPost("{gameCode}/join", Name = "JoinGame")]
     public async Task<JoinGameDTO> JoinGame(string gameCode, string playerName)
     {
@@ -72,6 +63,14 @@ public class GameController : ControllerBase
     public async Task<ActionResult> Vote(string gameCode, string votantId, string voteId)
     {
         await _gameService.Vote(gameCode, votantId, voteId);
+        
+        return Ok();
+    }
+    
+    [HttpPost("{gameCode}/{playerId}/addSongs", Name = "AddSongs")]
+    public async Task<ActionResult> AddSongs(string gameCode, string playerId, List<string> songsUrls)
+    {
+        await _gameService.AddSongs(gameCode, playerId, songsUrls);
         
         return Ok();
     }

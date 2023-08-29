@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using Microsoft.AspNetCore.SignalR;
 using SignalRSwaggerGen.Attributes;
 
-namespace SWITSTIGPTY.Services;
+namespace PlaylistGame.Services;
 
 
 /// <summary>

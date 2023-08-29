@@ -9,9 +9,9 @@ defineProps({
 
 <template>
   <div class="greetings">
-    <h1 class="green">{{ msg }}</h1>
+    <h1 class="red">{{ msg }}</h1>
     <h3>
-      Spoti What Is The Song Today I'm Gonna Play To You !
+        Playlist what is the song... wait... <span class="red">who put this song</span>?
     </h3>
   </div>
 </template>

@@ -1,4 +1,4 @@
-namespace SWITSTIGPTY.Models;
+namespace PlaylistGame.Models;
 
 public class ConnectionSetting
 {

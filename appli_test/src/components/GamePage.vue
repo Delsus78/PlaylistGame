@@ -1,15 +1,14 @@
 <script setup>
 import {computed, ref} from "vue";
-import store from "@/store";
+import { useStore } from "vuex";
 import * as signalR from "@microsoft/signalr";
 import config from "@/config";
 import ResultPage from "@/components/ResultPage.vue";
 import WaitPage from "@/components/WaitPage.vue";
 import InGamePage from "@/components/InGamePage.vue";
-import LoadingPage from "@/components/LoadingPage.vue";
 
-
-const emit = defineEmits(["leave","vote","endRound", "nextRound"]);
+const store = useStore();
+const emit = defineEmits(["leave","vote","endRound", "nextRound", "addSongs"]);
 const gamePhase = ref("not-started");
 const game = computed(() => store.state.game);
 const player = computed(() => store.state.player);
@@ -34,40 +33,46 @@ const handleLeave = async () => {
     }).finally(() => emit('leave', gamePhase.value));
 }
 
-connection.on("next-round", (message) => {
+connection.on("next-round", (gameMsg) => {
     // reset votes
-    message.game.players.forEach(player => {
+    gameMsg.players.forEach(player => {
         player.hasVoted = false;
     });
 
-    assignGame(message.game);
-    selectedYoutubeUrl.value = game.value.songsUrls[message.indexOfSong];
+    assignGame(gameMsg);
+    selectedYoutubeUrl.value = game.value.songs[game.value.actualSongIndex].songUrl;
 
     setGamePhase("started");
 });
 
-connection.on("end-round", (players) => {
-    assignPlayers(players);
+connection.on("end-round", (gameMsg) => {
+    assignGame(gameMsg);
     setGamePhase("result");
 });
 
 connection.on("game-ended", (playersReceived) => {
+    console.log("game-ended")
     assignPlayers(playersReceived);
     setGamePhase("end-result");
 });
 
 connection.on("new-vote", (votingPlayerId) => {
+    console.log("new-vote");
     store.dispatch('setHasVoted', votingPlayerId);
 });
 
-connection.on("player-number-changed", (message) => {
-    store.dispatch('setPlayerCount', message);
+connection.on("players-changed", (gameMsg) => {
+    console.log("players-changed");
+    assignGame(gameMsg);
+});
+
+connection.on("new-songs", (gameMsg) => {
+    assignGame(gameMsg);
 });
 
 // END SIGNALR PART
 
 const handleNextRound = async () => {
-    gamePhase.value = "loading";
     emit('nextRound');
 }
 
@@ -81,12 +86,9 @@ const assignGame = (game) => {
 
 </script>
 <template>
-    <div v-if="gamePhase === 'loading'">
-        <LoadingPage></LoadingPage>
-    </div>
-    <div v-else-if="gamePhase === 'not-started'">
-        <WaitPage :game="game" :isOwner="player.isOwner"
-                  @leave="handleLeave" @start="handleNextRound"></WaitPage>
+    <div v-if="gamePhase === 'not-started'">
+        <WaitPage :game="game" :isOwner="player.isOwner" :displayAddSongsSection="!player.isSongsGiven"
+                  @leave="handleLeave" @start="handleNextRound" @add-songs="emit('addSongs', $event)"></WaitPage>
     </div>
 
     <div v-else-if="gamePhase === 'started'">
@@ -95,7 +97,7 @@ const assignGame = (game) => {
     </div>
 
     <div v-else-if="gamePhase === 'result'">
-        <ResultPage :isOwner="player.isOwner" :players="game.players"
+        <ResultPage :isOwner="player.isOwner" :players="game.players" :impostor-id="game.songs[game.actualSongIndex].playerId"
                     @nextRound="handleNextRound"></ResultPage>
     </div>
 

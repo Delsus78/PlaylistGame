@@ -1,4 +1,4 @@
-namespace SWITSTIGPTY.Services.Repositories;
+namespace PlaylistGame.Services.Repositories;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class MongoCollectionAttribute : System.Attribute

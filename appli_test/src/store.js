@@ -6,13 +6,12 @@ export default createStore({
             gameCode: null,
             playerCount: 0,
             players: [],
-            songsUrls: [],
-            numberOfManches: 0,
-            currentManche: 0,
+            songs: [],
+            songsCount: 0,
+            numberOfSongsPerPlayer: 0,
+            actualSongIndex: 0,
             pointPerRightVote: 0,
-            pointPerVoteFooled: 0,
-            genre: "",
-            type: ""
+            pointPerVoteFooled: 0
         },
         player: {
             id: "",
@@ -20,16 +19,27 @@ export default createStore({
             imageUrl: "",
             score: 0,
             votedId: "",
-            isOwner: false
+            isOwner: false,
+            isSongsGiven: false
         },
+        missingPlayers: []
     },
     mutations: {
         // GAME MUTATIONS
         setGame(state, game) {
+
+            // calculate missing players
+            const playersId = game.players.map((player) => player.id);
+            const songsPlayersId = game.songs.map((song) => song.playerId);
+            const playersIdMissing = playersId.filter((playerId) => !songsPlayersId.includes(playerId));
+
+            // get all players name from id
+            state.missingPlayers = playersIdMissing.map((playerId) => {
+                const player = game.players.find((player) => player.id === playerId);
+                return player ? player.name : "";
+            });
+
             state.game = game;
-        },
-        setGameCode(state, code) {
-            state.game.gameCode = code;
         },
         setPlayerCount(state, count) {
             state.game.playerCount = count;
@@ -37,50 +47,18 @@ export default createStore({
         setPlayers(state, players) {
             state.game.players = players;
         },
-        setSongsUrls(state, urls) {
-            state.game.songsUrls = urls;
-        },
-        setNumberOfManches(state, number) {
-            state.game.numberOfManches = number;
-        },
-        setCurrentManche(state, number) {
-            state.game.currentManche = number;
-        },
-        setPointPerRightVote(state, point) {
-            state.game.pointPerRightVote = point;
-        },
-        setPointPerVoteFooled(state, point) {
-            state.game.pointPerVoteFooled = point;
-        },
-        setGenre(state, genre) {
-            state.game.genre = genre;
-        },
-        setType(state, type) {
-            state.game.type = type;
-        },
         // PLAYER MUTATIONS
         setPlayer(state, player) {
             state.player = player;
         },
-        setScore(state, score) {
-            state.player.score = score;
-        },
-        setPlayerId(state, id) {
-            state.player.id = id;
-        },
-        setVotedId(state, id) {
-            state.player.votedId = id;
-        },
-        setPlayerName(state, name) {
-            state.player.name = name;
-        },
-        setPlayerImageUrl(state, url) {
-            state.player.imageUrl = url;
-        },
         setPlayerIsOwner(state, isOwner) {
             state.player.isOwner = isOwner;
         },
+        setPlayerIsSongsGiven(state, isSongsGiven) {
+            state.player.isSongsGiven = isSongsGiven;
+        },
         SET_HAS_VOTED(state, playerId) {
+            console.log('SET_HAS_VOTED ', playerId);
             const player = state.game.players.find(p => p.id === playerId);
             if (player) player.hasVoted = true;
         },
@@ -89,13 +67,12 @@ export default createStore({
                 gameCode: null,
                 playerCount: 0,
                 players: [],
-                songsUrls: [],
-                numberOfManches: 0,
-                currentManche: 0,
+                songs: [],
+                songsCount: 0,
+                numberOfSongsPerPlayer: 0,
+                actualSongIndex: 0,
                 pointPerRightVote: 0,
-                pointPerVoteFooled: 0,
-                genre: "",
-                type: ""
+                pointPerVoteFooled: 0
             };
             state.player = {
                 id: "",
@@ -118,57 +95,21 @@ export default createStore({
         setGame({ commit }, game) {
             commit('setGame', game);
         },
-        setGameCode({ commit }, code) {
-            commit('setGameCode', code);
-        },
         setPlayerCount({ commit }, count) {
             commit('setPlayerCount', count);
         },
         setPlayers({ commit }, players) {
             commit('setPlayers', players);
         },
-        setSongsUrls({ commit }, urls) {
-            commit('setSongsUrls', urls);
-        },
-        setNumberOfManches({ commit }, number) {
-            commit('setNumberOfManches', number);
-        },
-        setCurrentManche({ commit }, number) {
-            commit('setCurrentManche', number);
-        },
-        setPointPerRightVote({ commit }, point) {
-            commit('setPointPerRightVote', point);
-        },
-        setPointPerVoteFooled({ commit }, point) {
-            commit('setPointPerVoteFooled', point);
-        },
-        setGenre({ commit }, genre) {
-            commit('setGenre', genre);
-        },
-        setType({ commit }, type) {
-            commit('setType', type);
-        },
         // PLAYER ACTIONS
         setPlayer({ commit }, player) {
             commit('setPlayer', player);
         },
-        setScore({ commit }, score) {
-            commit('setScore', score);
-        },
-        setPlayerId({ commit }, id) {
-            commit('setPlayerId', id);
-        },
-        setVotedId({ commit }, id) {
-            commit('setVotedId', id);
-        },
-        setPlayerName({ commit }, name) {
-            commit('setPlayerName', name);
-        },
-        setPlayerImageUrl({ commit }, url) {
-            commit('setPlayerImageUrl', url);
-        },
         setPlayerIsOwner({ commit }, isOwner) {
             commit('setPlayerIsOwner', isOwner);
+        },
+        setPlayerIsSongsGiven({ commit }, isSongsGiven) {
+            commit('setPlayerIsSongsGiven', isSongsGiven);
         }
     }
 });

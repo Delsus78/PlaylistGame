@@ -2,7 +2,7 @@
 import HelloWorld from './components/HelloWorld.vue'
 import ConnexionPage from './components/ConnexionPage.vue'
 import Logo from "@/components/icons/Logo.vue";
-import {computed, ref} from "vue";
+import {computed} from "vue";
 import { useStore } from "vuex";
 import GamePage from "@/components/GamePage.vue";  // Ajouté pour accéder au store
 import axios from 'axios';
@@ -12,6 +12,7 @@ import GameInfo from "@/components/GameInfo.vue";
 const store = useStore();
 const game = computed(() => store.state.game);
 const player = computed(() => store.state.player);
+const missingPlayers = computed(() => store.state.missingPlayers);
 
 const handleCodeRetrieved = async (code, playerName) => {
     // join game
@@ -30,18 +31,17 @@ const handleCodeRetrieved = async (code, playerName) => {
 
 const handleGameCreated = async (gameParams, playerName) => {
     try {
-        const url = `${config.apiUrl}Game?type=${gameParams.type}${(gameParams.type === "genre" ? ("&genre=" + gameParams.genre) : "")}&numberOfManches=${gameParams.numberOfManches}&pointsPerRightVote=${gameParams.pointsPerRightVote}&pointsPerVoteFooled=${gameParams.pointsPerVoteFooled}`;
-        const gameInfo = await axios.get(url);
+        const url = `${config.apiUrl}Game?numberOfSongPerPlayer=${gameParams.numberOfSongsPerPlayer}&pointsPerRightVote=${gameParams.pointsPerRightVote}&pointsPerVoteFooled=${gameParams.pointsPerVoteFooled}`;
+        const gameInfo = await axios.post(url);
 
         //join it
         const response = await axios.post(config.apiUrl + "Game/" + gameInfo.data.gameCode + "/join?playerName=" + playerName);
 
-        await store.dispatch('setPlayerIsOwner', true);
-
         await assignGameStoreAtJoining(response.data);
 
         // set player as owner
-        await assignPlayerIsOwner(true);
+        await store.dispatch('setPlayerIsOwner', true);
+
     } catch (error) {
         console.error('Erreur lors de l\'appel API:', error);
     }
@@ -111,13 +111,25 @@ const handleEndRound = async () => {
     }
 }
 
+const handleAddSongs = async (songsToAdd) => {
+    try {
+        await axios.post(config.apiUrl + "Game/" + game.value.gameCode + "/"+ player.value.id +"/addSongs", songsToAdd);
+
+        await store.dispatch('setPlayerIsSongsGiven', true);
+    } catch (error) {
+        if (error.response.data.toString().includes("Song already added")) {
+            // get song url from error message (|| url ||)
+            const songUrl = error.response.data.toString().split("||")[1];
+            alert("Song already added = " + songUrl);
+        }
+        else
+          console.error('Erreur lors de l\'appel API:', error);
+    }
+}
+
 const assignGameStoreAtJoining = async (joinGameDTO) => {
     await store.dispatch('setGame', joinGameDTO.game);
     await store.dispatch('setPlayer', joinGameDTO.player);
-}
-
-const assignPlayerIsOwner = async (isOwner) => {
-    await store.dispatch('setPlayerIsOwner', isOwner);
 }
 
 </script>
@@ -126,10 +138,10 @@ const assignPlayerIsOwner = async (isOwner) => {
     <div class="right-main">
       <Logo class="logo"/>
       <div class="wrapper">
-          <HelloWorld msg="SWITSTIGPTY"/>
+          <HelloWorld msg="PLAYLIST GAME"/>
       </div>
     </div>
-    <GameInfo v-if="game.gameCode" :game="game"/>
+    <GameInfo v-if="game.gameCode" :game="game" :missing-players="missingPlayers"/>
   </header>
 
   <main>
@@ -140,6 +152,7 @@ const assignPlayerIsOwner = async (isOwner) => {
               @leave="handleLeaveGame"
               @end-round="handleEndRound"
               @next-round="handleNextRound"
+              @add-songs="handleAddSongs"
               @vote="handleVote"/>
   </main>
 
@@ -148,7 +161,7 @@ const assignPlayerIsOwner = async (isOwner) => {
           Stop
       </span>
       <span v-else class="footer-text">
-          © 2021 - SWITSTIGPTY v0.3.1 - All rights reserved to Team UNC
+          © 2021 - PLAYLIST GAME v0.3.1 - All rights reserved to Team UNC
       </span>
 
   </footer>

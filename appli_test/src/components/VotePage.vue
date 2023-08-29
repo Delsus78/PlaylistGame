@@ -14,6 +14,7 @@ const handleVote = (itemId) => {
     items.forEach(item => {
         item.isButtonOn = false;
     });
+    console.log(itemId);
     emit('vote', itemId);
 
 }

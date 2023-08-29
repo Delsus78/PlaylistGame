@@ -2,7 +2,7 @@
     <div class="player-result">
         <img :src="item?.imageUrl" alt="Joueur" class="player-image">
         <div class="player-info">
-            <h2 :class="{'impostor': item?.isImpostor}">{{ item?.name }} {{ item?.isImpostor ? 'IMPOSTOR' : ''}}</h2>
+            <h2 :class="{'impostor': isImpostor}">{{ item?.name }} {{ isImpostor ? 'IMPOSTOR' : ''}}</h2>
             <div class="voter-bar" :style="{ width: voterPercentage + '%' }"></div>
             <p class="voters">{{ item?.votersNames.join(', ') }}</p>
             <p class="songUrl" v-if="item?.songUrl">Song URL: <a :href="item?.songUrl" target="_blank" rel="noopener noreferrer">{{ item?.songUrl }}</a></p>
@@ -15,10 +15,14 @@
 import {computed} from "vue";
 import store from "@/store";
 
-const { item } = defineProps({
+const { item, isImpostor } = defineProps({
     item: {
         type: Object,
         required : true
+    },
+    isImpostor: {
+        type: Boolean,
+        default: false
     }
 });
 const allPlayers = computed(() => store.state.game.players);

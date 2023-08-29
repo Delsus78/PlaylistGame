@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 
-namespace SWITSTIGPTY.Services.Repositories;
+namespace PlaylistGame.Services.Repositories;
 
 public class MongoDbRepository
 {

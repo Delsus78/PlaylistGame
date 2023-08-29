@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.SignalR;
-using SWITSTIGPTY.Models;
+using PlaylistGame.Models;
 
-namespace SWITSTIGPTY.Services;
+namespace PlaylistGame.Services;
 
 public class GameHubService
 {
@@ -10,29 +10,6 @@ public class GameHubService
     public GameHubService(IHubContext<GameHub> hubContext)
     {
         _hubContext = hubContext;
-    }
-
-    public async Task NotifyNewPlayerNumber(string groupName, string message)
-    {
-        await _hubContext.Clients.Group(groupName).SendAsync("player-number-changed", message);
-    }
-    
-    public async Task SendToGroupExceptListAsync(string groupName, string emitName ,object message, object messageToExcept, List<string> playersIdToExcept)
-    {
-        if (GameHub.GroupMembers.TryGetValue(groupName, out var members))
-        {
-            // Sélectionner un membre aléatoire
-            var exceptedConnIds = GameHub.GroupMembers[groupName]
-                .Where(x => playersIdToExcept.Contains(x.Item2))
-                .Select(x => x.Item1)
-                .ToList();
-
-            // Envoyer le message au groupe sauf au membre sélectionné
-            await _hubContext.Clients.GroupExcept(groupName, exceptedConnIds).SendAsync(emitName, message);
-            
-            // Envoyer le message aux membres sélectionnés
-            await _hubContext.Clients.Clients(exceptedConnIds).SendAsync(emitName, messageToExcept);
-        }
     }
 
     public async Task NotifyGameEnded(string groupName, List<Player> players)
@@ -45,9 +22,9 @@ public class GameHubService
         await _hubContext.Clients.Group(groupName).SendAsync("new-vote", playerId);
     }
     
-    public async Task NotifyEndRound(string groupeName, List<Player> players)
+    public async Task NotifyEndRound(string groupeName, Game game)
     {
-        await _hubContext.Clients.Group(groupeName).SendAsync("end-round", players);
+        await _hubContext.Clients.Group(groupeName).SendAsync("end-round", game);
     }
     
     public async Task LeaveGroup(string groupName, string playerId)
@@ -57,5 +34,20 @@ public class GameHubService
         {
             members.RemoveWhere(x => x.Item2 == playerId);
         }
+    }
+
+    public async Task NotifyNewSongs(string gameCode, Game game)
+    {
+        await _hubContext.Clients.Group(gameCode).SendAsync("new-songs", game);
+    }
+    
+    public async Task NotifyNewPlayerNumber(string groupName, Game game)
+    {
+        await _hubContext.Clients.Group(groupName).SendAsync("players-changed", game);
+    }
+
+    public async Task NotifyNextRound(string groupName, object game)
+    {
+        await _hubContext.Clients.Group(groupName).SendAsync("next-round", game);
     }
 }

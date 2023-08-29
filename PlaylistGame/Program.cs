@@ -1,8 +1,8 @@
-using SWITSTIGPTY.Models;
-using SWITSTIGPTY.Services;
+using PlaylistGame.Models;
+using PlaylistGame.Services;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.WebHost.UseUrls("http://*:5000");
+builder.WebHost.UseUrls("http://*:5001");
 
 // Add services to the container.
 var services = builder.Services;
@@ -17,7 +17,7 @@ services.AddControllers();
 
 services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "SWITSTIGPTY", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "PlaylistGame", Version = "v1" });
     c.AddSignalRSwaggerGen();
 });
 
@@ -28,19 +28,13 @@ services.Configure<ConnectionSetting>(
         options.DatabaseName = configuration.GetSection("MongoDb:DatabaseName").Value;
     });
 
-services.Configure<ApiSetting>(
-    options =>
-    {
-        options.RandomSongApiUrl = configuration.GetSection("ApiUrls:RandomSongApiUrl").Value;
-    });
-
 // cors
 services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
         {
             Console.Out.WriteLine("Adding cors policy");
-            builder.WithOrigins("http://localhost:5173", "http://switstigpty.team-unc.fr") // Ajoutez votre domaine client ici
+            builder.WithOrigins("http://localhost:5173", "http://playlistgame.team-unc.fr") // Ajoutez votre domaine client ici
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials(); // Important pour SignalR

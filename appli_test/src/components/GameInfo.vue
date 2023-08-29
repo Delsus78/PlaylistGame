@@ -2,37 +2,60 @@
     <div class="game-info">
         <ul>
             <li><span class="number-info">{{ game.playerCount }}</span> Joueurs</li>
-            <li><span class="number-info">{{ game.numberOfManches }}</span> Manches</li>
-            <li>Manche <span class="number-info">{{ game.currentManche }}</span> en cours</li>
+            <li><span class="number-info">{{ game.numberOfSongsPerPlayer * game.playerCount }}</span> Manches</li>
+            <li v-if="game.actualSongIndex !== -1">Manche <span class="number-info">{{ game.actualSongIndex + 1}}</span> en cours</li>
+            <li>Nombre de musique au total : <span class="number-info">{{ game.songsCount }}</span></li>
+            <li>
+                Joueurs manquants : {{ missingPlayers.length }}
+                <div v-for="playerName in missingPlayers" :key="playerName">
+                    <span class="number-info">{{ playerName }}</span>
+                </div>
+            </li>
             <li><span class="number-info">{{ game.pointPerRightVote }}</span> Points par vote sur l'imposteur</li>
             <li><span class="number-info">{{ game.pointPerVoteFooled }}</span> Points par vote trompé en tant qu'imposteur</li>
-            <li v-if="game.genre">Genre : <span class="number-info">{{ game.genre }}</span></li>
-            <li>Type : <span class="number-info">{{ game.type }}</span></li>
         </ul>
     </div>
 </template>
 
-<script>
-export default {
-    name: 'GameInfo',
-    props: {
-        game: {
-            type: Object,
-            required: true,
-            default: () => ({
-                gameCode: null,
-                playerCount: 0,
-                numberOfManches: 0,
-                currentManche: 0,
-                pointPerRightVote: 0,
-                pointPerVoteFooled: 0,
-                genre: "",
-                type: ""
-            })
-        }
-    }
-}
+<script setup>
+import { computed } from "vue";
+
+const { game, missingPlayers } = defineProps({
+    game: {
+        type: Object,
+        required: true,
+        default: () => ({
+            gameCode: null,
+            playerCount: 0,
+            songsCount: 0,
+            numberOfSongsPerPlayer: 0,
+            actualSongIndex: 0,
+            pointPerRightVote: 0,
+            pointPerVoteFooled: 0,
+            players: [],
+            songs: [],
+        }),
+    },
+    missingPlayers: {
+        type: Array,
+        required: true,
+        default: () => [],
+    },
+});
+
+import { watch } from "vue";
+
+watch(() => game.players, () => {
+    console.log("game.players has changed, recalculating missingPlayers");
+    // recalculating missingPlayers
+}, { deep: true });
+
+watch(() => game.songs, () => {
+    console.log("game.songs has changed, recalculating missingPlayers");
+    // recalculating missingPlayers
+}, { deep: true });
 </script>
+
 
 <style scoped>
 .game-info {
@@ -53,9 +76,9 @@ export default {
 
 .number-info {
     font-size: 1.4rem; /* un peu plus gros que le reste du texte */
-    color: var(--vt-c-green-2); /* Utiliser une couleur contrastante, comme un vert vif par exemple */
+    color: var(--vt-c-red-1); /* Utiliser une couleur contrastante, comme un vert vif par exemple */
     font-weight: bold; /* Pour rendre le texte gras */
-    text-shadow: 0px 0px 5px rgba(0, 128, 0, 0.3); /* une petite ombre pour le faire ressortir davantage */
+    text-shadow: 0px 0px 5px rgba(255, 0, 0, 0.6); /* une petite ombre pour le faire ressortir davantage */
     margin-top: 10px;
 }
 </style>
