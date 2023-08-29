@@ -33,14 +33,14 @@ jobs:
       run: |
         echo "$DEPLOY_KEY" > deploy_key
         chmod 600 deploy_key
-        rsync -av --delete -e "ssh -i deploy_key -o StrictHostKeyChecking=no -p 19452" ./SWITSTIGPTY/bin/Release/net7.0/publish deploy@146.59.158.8:/home/ubuntu/SWITSTIGPTY
+        rsync -av --delete -e "ssh -i deploy_key -o StrictHostKeyChecking=no -p 19452" PlaylistGame/bin/Debug/net7.0/ deploy@146.59.158.8:/home/ubuntu/PlaylistGame
         rm -f deploy_key
 
-    - name: Restart switstigpty.service
+    - name: Restart playlistgame.service
       env:
         DEPLOY_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       run: |
         echo "$DEPLOY_KEY" > deploy_key
         chmod 600 deploy_key
-        ssh -i deploy_key -o StrictHostKeyChecking=no -p 19452 deploy@146.59.158.8 "sudo systemctl restart switstigpty.service"
+        ssh -i deploy_key -o StrictHostKeyChecking=no -p 19452 deploy@146.59.158.8 "sudo systemctl restart playlistgame.service"
         rm -f deploy_key
