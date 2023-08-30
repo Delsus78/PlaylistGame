@@ -28,9 +28,9 @@ public class GameController : ControllerBase
     /// <param name="pointsPerVoteFooled"></param>
     /// <returns></returns>
     [HttpPost(Name = "CreateGame")]
-    public async Task<Game> CreateGame(int numberOfSongPerPlayer, int pointsPerRightVote, int pointsPerVoteFooled)
+    public async Task<Game> CreateGame(int numberOfSongPerPlayer, int pointsPerRightVote, int pointsPerVoteFooled, int numberOfRandomSongDeleted)
     {
-        return await _gameService.CreateGame(numberOfSongPerPlayer, pointsPerRightVote, pointsPerVoteFooled);
+        return await _gameService.CreateGame(numberOfSongPerPlayer, pointsPerRightVote, pointsPerVoteFooled, numberOfRandomSongDeleted);
     }
     
     [HttpGet("{gameCode}", Name = "GetGame")]

@@ -31,7 +31,7 @@ const handleCodeRetrieved = async (code, playerName) => {
 
 const handleGameCreated = async (gameParams, playerName) => {
     try {
-        const url = `${config.apiUrl}Game?numberOfSongPerPlayer=${gameParams.numberOfSongsPerPlayer}&pointsPerRightVote=${gameParams.pointsPerRightVote}&pointsPerVoteFooled=${gameParams.pointsPerVoteFooled}`;
+        const url = `${config.apiUrl}Game?numberOfSongPerPlayer=${gameParams.numberOfSongsPerPlayer}&pointsPerRightVote=${gameParams.pointsPerRightVote}&pointsPerVoteFooled=${gameParams.pointsPerVoteFooled}&numberOfRandomSongDeleted=${gameParams.numberOfRandomSongDeleted}`;
         const gameInfo = await axios.post(url);
 
         //join it

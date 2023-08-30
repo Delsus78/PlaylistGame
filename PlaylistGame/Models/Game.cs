@@ -15,4 +15,5 @@ public class Game
     public int NumberOfSongsPerPlayer { get; set; }
     public int PointPerRightVote { get; set; }
     public int PointPerVoteFooled { get; set; }
+    public int NumberOfRandomSongDeleted { get; set; }
 }
