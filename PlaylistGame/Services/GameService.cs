@@ -44,7 +44,7 @@ public class GameService
         return finalString;
     }
 
-    public async Task<Game> CreateGame(int numberOfSongPerPlayer, int pointPerRightVote, int pointPerVoteFooled)
+    public async Task<Game> CreateGame(int numberOfSongPerPlayer, int pointPerRightVote, int pointPerVoteFooled, int numberOfRandomSongDeleted)
     {
         var gameCode = GenerateId();
         
@@ -56,7 +56,8 @@ public class GameService
             Songs = new List<SongInfo>(),
             NumberOfSongsPerPlayer = numberOfSongPerPlayer,
             PointPerRightVote = pointPerRightVote,
-            PointPerVoteFooled = pointPerVoteFooled
+            PointPerVoteFooled = pointPerVoteFooled,
+            NumberOfRandomSongDeleted = numberOfRandomSongDeleted,
         };
 
         // register the game
@@ -165,6 +166,10 @@ public class GameService
         if (game.ActualSongIndex == -1)
         {
             game.Songs = game.Songs.OrderBy(x => new Random().Next()).ToList();
+            
+            // delete random songs
+            for (var i = 0; i < game.NumberOfRandomSongDeleted; i++)
+                game.Songs.RemoveAt(0);
         }
         
         game.ActualSongIndex++;

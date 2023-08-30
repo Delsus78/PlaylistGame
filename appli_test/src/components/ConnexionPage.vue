@@ -11,6 +11,7 @@ const gameCode = ref('');
 const numberOfSongsPerPlayer = ref(+localStorage.getItem('numberOfSongsPerPlayer') || 1);
 const pointsPerRightVote = ref(+localStorage.getItem('pointsPerRightVote') || 1);
 const pointsPerVoteFooled = ref(+localStorage.getItem('pointsPerVoteFooled') || 2);
+const numberOfRandomSongDeleted = ref(+localStorage.getItem('numberOfRandomSongDeleted') || 0);
 const pseudo = ref(localStorage.getItem('pseudo') || '');
 const isErrored = ref(false);
 const emit = defineEmits(["code-retrieved","game-created"]);
@@ -19,6 +20,8 @@ const saveLocalStorage = () =>  {
     localStorage.setItem('pseudo', pseudo.value);
     localStorage.setItem('numberOfSongsPerPlayer', numberOfSongsPerPlayer.value.toString());
     localStorage.setItem('pointsPerRightVote', pointsPerRightVote.value.toString());
+    localStorage.setItem('pointsPerVoteFooled', pointsPerVoteFooled.value.toString());
+    localStorage.setItem('numberOfRandomSongDeleted', numberOfRandomSongDeleted.value.toString());
 }
 
 const handleCodeValueChanged = (newValue) => {
@@ -49,7 +52,8 @@ const handleGameCreation = () => {
         {
             numberOfSongsPerPlayer: numberOfSongsPerPlayer.value,
             pointsPerRightVote: pointsPerRightVote.value,
-            pointsPerVoteFooled: pointsPerVoteFooled.value
+            pointsPerVoteFooled: pointsPerVoteFooled.value,
+            numberOfRandomSongDeleted: numberOfRandomSongDeleted.value
         }, pseudo.value);
 }
 
@@ -83,11 +87,13 @@ const handleGameCreation = () => {
                 <h4>Number of songs / player</h4>
                 <h4>Points / right vote</h4>
                 <h4>Points / fooled vote</h4>
+                <h4>Random songs deleted</h4>
             </div>
             <div class="number-inputs-container">
                 <text-box :default-value="numberOfSongsPerPlayer" placeholder="Number of songs per players" is-number-only @value-changed="numberOfSongsPerPlayer = $event" />
                 <text-box :default-value="pointsPerRightVote" placeholder="Points/ right vote" is-number-only @value-changed="pointsPerRightVote = $event" />
                 <text-box :default-value="pointsPerVoteFooled" placeholder="Points/ fooled vote" is-number-only @value-changed="pointsPerVoteFooled = $event" />
+                <text-box :default-value="numberOfRandomSongDeleted" placeholder="Number of random songs deleted" is-number-only @value-changed="numberOfRandomSongDeleted = $event" />
             </div>
         </div>
         <ValidationButton msg="Create" @onClick="handleGameCreation"/>
