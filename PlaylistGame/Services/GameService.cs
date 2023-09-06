@@ -66,6 +66,17 @@ public class GameService
         return game;
     }
     
+    public async Task<JoinGameDTO> ReconnectGame(string gameCode, string playerId)
+    {
+        var game = await GetGame(gameCode);
+        var player = game.Players.FirstOrDefault(p => p.Id == playerId);
+        
+        if (player == null)
+            throw new Exception("Player not found");
+        
+        return new JoinGameDTO {Game = game, Player = player};
+    }
+    
     public async Task<JoinGameDTO> JoinGame(string gameCode, string playerName)
     {
         var game = await GetGame(gameCode);
@@ -118,7 +129,8 @@ public class GameService
     public async Task EndGame(string gameCode)
     {
         var game = await GetGame(gameCode);
-        
+        game.GamePhase = "end-result";
+
         await _gameHubService.NotifyGameEnded(gameCode, game.Players);
         
         
@@ -182,13 +194,16 @@ public class GameService
             await EndGame(gameCode);
             return;
         }
-        
+
+        game.GamePhase = "started";
+
         await _gameHubService.NotifyNextRound(game.GameCode, game);
     }
 
     public async Task EndRound(string gameCode)
     {
         var game = await GetGame(gameCode);
+        game.GamePhase = "result";
         
         await _gameHubService.NotifyEndRound(gameCode, game);
     }
