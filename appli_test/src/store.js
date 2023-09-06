@@ -11,6 +11,7 @@ export default createStore({
             numberOfSongsPerPlayer: 0,
             actualSongIndex: 0,
             pointPerRightVote: 0,
+            gamePhase: "",
             pointPerVoteFooled: 0
         },
         player: {
@@ -40,6 +41,12 @@ export default createStore({
             });
 
             state.game = game;
+        },
+        setGameCode(state, gameCode) {
+            state.game.gameCode = gameCode;
+        },
+        setGamePhase(state, phase) {
+            state.game.gamePhase = phase;
         },
         setPlayerCount(state, count) {
             state.game.playerCount = count;
@@ -72,6 +79,7 @@ export default createStore({
                 numberOfSongsPerPlayer: 0,
                 actualSongIndex: 0,
                 pointPerRightVote: 0,
+                gamePhase: "",
                 pointPerVoteFooled: 0
             };
             state.player = {
@@ -94,6 +102,12 @@ export default createStore({
         // GAME ACTIONS
         setGame({ commit }, game) {
             commit('setGame', game);
+        },
+        setGameCode({ commit }, gameCode) {
+            commit('setGameCode', gameCode);
+        },
+        setGamePhase({ commit }, phase) {
+            commit('setGamePhase', phase);
         },
         setPlayerCount({ commit }, count) {
             commit('setPlayerCount', count);
